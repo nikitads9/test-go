@@ -6,25 +6,42 @@ import (
 )
 
 func main() {
-	slice := []int64{1, 2, 3, 4, 5, 6, 7, 8, 9}
-	res, err := SplitSlice(slice, 2)
-	if err != nil {
-		panic("could not split")
+	var size int
+
+	fmt.Println("enter slice size")
+	fmt.Scan(&size)
+	data := make([]int64, size, size)
+	fmt.Println("enter slice elements")
+
+	for i := 0; i < size; i++ {
+		fmt.Scan(&data[i])
 	}
+	fmt.Println("enter batch size")
+	fmt.Scan(&size)
+
+	res, err := SplitSlice(data, size)
+	if err != nil {
+		fmt.Println("could not split")
+		return
+	}
+
 	fmt.Printf("%v ", res)
 }
 
-func SplitSlice(numbers []int64, batchsize int) ([][]int64, error) {
+func SplitSlice(numbers []int64, batchSize int) ([][]int64, error) {
 	var begin, end int
-	if batchsize < 0 || numbers == nil {
+
+	if batchSize < 0 || numbers == nil {
 		return nil, errors.New("invalid batch size or empty slice")
 	}
-	quantity := len(numbers) / int(batchsize)
-	if len(numbers)%int(batchsize) != 0 {
+
+	quantity := len(numbers) / int(batchSize)
+	if len(numbers)%int(batchSize) != 0 {
 		quantity += 1
 	}
-	end = batchsize
+	end = batchSize
 	batches := make([][]int64, quantity)
+
 	for i := 0; i < quantity; i++ {
 		if end > len(numbers) {
 			batches[i] = numbers[begin:]
@@ -32,27 +49,30 @@ func SplitSlice(numbers []int64, batchsize int) ([][]int64, error) {
 		}
 		batches[i] = numbers[begin:end]
 		begin = end
-		end += int(batchsize)
+		end += int(batchSize)
 	}
 	return batches, nil
 }
 
-/* groupCity := map[int][]string{
-	10:   []string{"Деревня", "Село"},        // города с населением 10-99 тыс. человек
-	100:  []string{"Город", "Большой город"}, // города с населением 100-999 тыс. человек
-	1000: []string{"Миллионик"},              // города с населением 1000 тыс. человек и более
-}
-cityPopulation := map[string]int{
-	"Село":      100,
-	"Миллионик": 500,
-}
-for _, val := range groupCity[10] {
-	if _, found := cityPopulation[val]; found {
-		delete(cityPopulation, val)
+func twoSum(nums []int, target int) []int {
+	res := make([]int, 2)
+	numMap := make(map[int]int, len(nums))
+	var difference int
+
+	for i, elem := range nums {
+		if (target > elem && elem >= 0) || (target < 0) || elem < 0 && target > 0 || elem > target || elem < 0 && target == 0 {
+			difference = target - elem
+		} else {
+			difference = elem - target
+		}
+		if i < len(nums) {
+			if num, inMap := numMap[target-difference]; inMap {
+				res[0], res[1] = num, i
+				return res
+			} else {
+				numMap[difference] = i
+			}
+		}
 	}
+	return res
 }
-for _, val := range groupCity[1000] {
-	if _, found := cityPopulation[val]; found {
-		delete(cityPopulation, val)
-	}
-} */
